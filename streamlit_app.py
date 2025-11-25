@@ -29,6 +29,10 @@ def procesar_pagos_stp(file):
         if 'NumeroClienteSAP' in df.columns:
             df['NumeroClienteSAP'] = pd.to_numeric(df['NumeroClienteSAP'], errors='coerce')
         df = df.dropna(subset=['NumeroClienteSAP', 'Monto'])
+
+        # Filtrar clientes que empiezan con 9999
+        df = df[~df['NumeroClienteSAP'].astype(str).str.startswith('9999')]
+
         tabla_dinamica = df.groupby('NumeroClienteSAP')['Monto'].sum().reset_index()
         tabla_dinamica.columns = ['ID_CLIENTE', 'Monto_STP']
         return tabla_dinamica
@@ -116,7 +120,7 @@ def detectar_irregularidades(tabla_stp, tabla_ingresos, df_completo_ingresos):
 
         if monto_reportado == 0:
             resultado.at[idx, 'Motivo'] = 'Sin pago aplicado en POS'
-        elif abs(diferencia) < 0.01:
+        elif abs(diferencia) <= 15:
             resultado.at[idx, 'Motivo'] = 'OK'
         elif monto_stp > 0 and monto_reportado > monto_stp:
             ratio = monto_reportado / monto_stp
