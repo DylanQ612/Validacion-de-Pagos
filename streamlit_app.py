@@ -120,7 +120,7 @@ def detectar_irregularidades(tabla_stp, tabla_ingresos, df_completo_ingresos):
 
         if monto_reportado == 0:
             resultado.at[idx, 'Motivo'] = 'Sin pago aplicado en POS'
-        elif abs(diferencia) <= 15:
+        elif abs(diferencia) <= 35:
             resultado.at[idx, 'Motivo'] = 'OK'
         elif monto_stp > 0 and monto_reportado > monto_stp:
             ratio = monto_reportado / monto_stp
